@@ -1,0 +1,68 @@
+[package]
+name = "tokio-osinterval"
+version = "0.1.0"
+edition = "2021"
+rust-version = "1.81"
+description = "An OS-native-timer-backed alternative to tokio::time::Interval (timerfd / kqueue / CreateThreadpoolTimer)."
+license = "BSD-2-Clause"
+readme = "README.md"
+repository = "https://github.com/ogital-net/tokio-osinterval"
+homepage = "https://github.com/ogital-net/tokio-osinterval"
+documentation = "https://docs.rs/tokio-osinterval"
+keywords = ["tokio", "timer", "interval", "timerfd", "kqueue"]
+categories = ["asynchronous", "os"]
+include = [
+    "src/**/*.rs",
+    "examples/**/*.rs",
+    "Cargo.toml",
+    "README.md",
+    "LICENSE",
+]
+
+[package.metadata.docs.rs]
+all-features = true
+rustdoc-args = ["--cfg", "docsrs"]
+
+[features]
+default = ["interval", "os-native"]
+# Enables `OsInterval`, the drop-in-style alternative to
+# `tokio::time::Interval`. Disable if you only want `PeriodicInterval`.
+interval = []
+# Disable to force the portable fallback backend (tokio::time::sleep_until)
+# even on platforms where a native backend exists. Has no effect unless
+# the `interval` feature is also enabled.
+os-native = []
+# Enables `PeriodicInterval`, a stripped-down ticker driven by a single
+# kernel-side periodic timer (timerfd on Linux/Android, EVFILT_TIMER on
+# macOS/*BSD). No `MissedTickBehavior`, no resets, no per-tick re-arming —
+# intended for cron-style schedulers where coarse resolution is fine.
+periodic = []
+
+[target.'cfg(unix)'.dependencies]
+tokio = { version = "1", features = ["net", "time"] }
+libc = "0.2"
+
+[target.'cfg(windows)'.dependencies]
+tokio = { version = "1", features = ["time"] }
+windows-sys = { version = "0.61", features = [
+    "Win32_System_Threading",
+    "Win32_Foundation",
+    "Win32_Security",
+] }
+
+[dev-dependencies]
+tokio = { version = "1", features = ["rt-multi-thread", "macros", "test-util", "time"] }
+criterion = { version = "0.5", features = ["async_tokio"] }
+
+[[bench]]
+name = "precision"
+harness = false
+required-features = ["interval"]
+
+[[example]]
+name = "heartbeat"
+required-features = ["interval"]
+
+[[example]]
+name = "cron"
+required-features = ["periodic"]
