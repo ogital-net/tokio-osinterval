@@ -232,7 +232,7 @@ For everything else, prefer `OsInterval`.
   tests rely on `tokio::time::pause()`, either use `tokio::time::Interval`
   directly or pull this crate in with the native backend disabled:
   ```toml
-  tokio-osinterval = { version = "0.1", default-features = false, features = ["interval"] }
+  tokio-osinterval = { version = "1", default-features = false, features = ["interval"] }
   ```
   (`default-features = false` alone removes `OsInterval` entirely — you
   must opt back in to `interval`.)
@@ -245,8 +245,7 @@ For everything else, prefer `OsInterval`.
 
 ## MSRV
 
-Rust 1.81 (set as `rust-version` in `Cargo.toml`). The crate uses Rust
-2021 edition.
+Rust 1.81
 
 ## License
 
